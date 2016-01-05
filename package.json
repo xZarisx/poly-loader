@@ -1,0 +1,13 @@
+{
+  "name": "poly-loader",
+  "version": "1.0.0",
+  "description": "event driven polyfill loader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matthew Poulson",
+  "dependencies": {
+    "polyfill-custom-event": "^1.0.3"
+  }
+}
