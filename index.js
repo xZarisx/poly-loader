@@ -1,33 +1,29 @@
 import polyfill from 'polyfill-custom-event';
 
-let polyfills = [],
-    loadedPolys = [],
+let remainingPolyfills = [],
     donePolyfilling = new CustomEvent('donePolyfilling'),
     polyfilled = function (src) {
-        loadedPolys.push(src);
-        let incomplete = polyfills.filter(function (currentPoly) {
-            return !loadedPolys.some(function (currentLoaded) {
-                return currentLoaded === currentPoly;
-            });
-        });
-        if (incomplete.length === 0) {
-            window.dispatchEvent(donePolyfilling);
-        }
+        remainingPolyfills = remainingPolyfills.filter(polyfill => polyfill !== src);
+        remainingPolyfills.length || window.dispatchEvent(donePolyfilling);
     },
     polyfiller = function (testObject) {
         if (!testObject.test) {
             var s = document.createElement('script');
-            polyfills.push(testObject.fill);
-            s.type = 'text/javascript';
+            remainingPolyfills.push(testObject.fill);
             s.src = testObject.fill;
-            s.onload = polyfilled (testObject.fill);
+            s.onload = polyfilled(testObject.fill);
+            s.onerror = function () {
+                window.dispatchEvent(new CustomEvent('polyfillError', {
+                    detail: {
+                        polyfillSrc: testObject.fill
+                    }
+                }));
+            };
             document.head.appendChild(s);
         }
     };
 
-export default function (tests) {
+export default function (tests=[]) {
     tests.map(polyfiller);
-    if (polyfills.length === 0) {
-        window.dispatchEvent(donePolyfilling);
-    }
+    remainingPolyfills.length || window.dispatchEvent(donePolyfilling);
 }
