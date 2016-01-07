@@ -4,7 +4,9 @@ let remainingPolyfills = [],
     donePolyfilling = new CustomEvent('donePolyfilling'),
     polyfilled = function (src) {
         remainingPolyfills = remainingPolyfills.filter(polyfill => polyfill !== src);
-        remainingPolyfills.length || window.dispatchEvent(donePolyfilling);
+        if (remainingPolyfills.length) {
+            window.dispatchEvent(donePolyfilling);
+        }
     },
     polyfiller = function (testObject) {
         if (!testObject.test) {
@@ -25,5 +27,7 @@ let remainingPolyfills = [],
 
 export default function (tests=[]) {
     tests.map(polyfiller);
-    remainingPolyfills.length || window.dispatchEvent(donePolyfilling);
+    if (remainingPolyfills.length) {
+        window.dispatchEvent(donePolyfilling);
+    }
 }
